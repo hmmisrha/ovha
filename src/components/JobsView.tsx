@@ -1,8 +1,7 @@
-// Non-route helper (filename prefixed with `-` is ignored by TanStack router)
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { haversineKm, etaMinutes, useGeolocation } from "@/lib/geo";
+import { haversineKm, etaMinutes, getGeolocation } from "@/lib/geo";
 import { Power, MapPin, Clock, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";

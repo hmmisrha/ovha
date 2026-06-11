@@ -6,7 +6,7 @@ import { IssueChips, ISSUES, type Issue } from "@/components/IssueChips";
 import { ChatBot } from "@/components/ChatBot";
 import { Bot, ShieldAlert, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useGeolocation } from "@/lib/geo";
+import { getGeolocation } from "@/lib/geo";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
@@ -54,7 +54,7 @@ function DriverHome() {
     if (!user) return;
     setSending(true);
     try {
-      const pos = await useGeolocation();
+      const pos = await getGeolocation();
       const { data, error } = await supabase
         .from("sos_requests")
         .insert({

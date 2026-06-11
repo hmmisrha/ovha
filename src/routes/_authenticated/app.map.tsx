@@ -18,7 +18,7 @@ function MapPage() {
   const [markers, setMarkers] = useState<MapMarker[]>([]);
 
   useEffect(() => {
-    useGeolocation().then((p) => setCenter([p.lat, p.lng])).catch(() => {});
+    getGeolocation().then((p) => setCenter([p.lat, p.lng])).catch(() => {});
   }, []);
 
   useEffect(() => {
