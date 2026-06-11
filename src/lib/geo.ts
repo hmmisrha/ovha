@@ -12,7 +12,7 @@ export function etaMinutes(km: number, speedKmh = 40) {
   return Math.max(1, Math.round((km / speedKmh) * 60));
 }
 
-export function useGeolocation() {
+export function getGeolocation() {
   // simple non-hook helper
   return new Promise<{ lat: number; lng: number }>((resolve, reject) => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {

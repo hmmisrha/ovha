@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { haversineKm, etaMinutes, useGeolocation } from "@/lib/geo";
+import { haversineKm, etaMinutes, getGeolocation } from "@/lib/geo";
 import type { MapMarker } from "@/components/MapView";
 
 const MapView = lazy(() => import("@/components/MapView").then((m) => ({ default: m.MapView })));

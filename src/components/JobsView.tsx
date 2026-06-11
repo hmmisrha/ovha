@@ -24,7 +24,7 @@ export function JobsPage() {
   const online = profile?.is_online ?? false;
 
   useEffect(() => {
-    useGeolocation().then(setMe).catch(() => {});
+    getGeolocation().then(setMe).catch(() => {});
   }, []);
 
   useEffect(() => {

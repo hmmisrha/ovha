@@ -10,7 +10,7 @@ import { getGeolocation } from "@/lib/geo";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { JobsPage } from "./-jobs";
+import { JobsPage } from "@/components/JobsView";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({ meta: [{ title: "OVHA — Dashboard" }] }),
