@@ -14,7 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          sender_id: string
+          sos_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          sender_id: string
+          sos_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          sender_id?: string
+          sos_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_sos_id_fkey"
+            columns: ["sos_id"]
+            isOneToOne: false
+            referencedRelation: "sos_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          is_online: boolean
+          last_lat: number | null
+          last_lng: number | null
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          specialization: string | null
+          total_earnings: number
+          updated_at: string
+          vehicle_info: string | null
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string
+          id: string
+          is_online?: boolean
+          last_lat?: number | null
+          last_lng?: number | null
+          phone?: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          specialization?: string | null
+          total_earnings?: number
+          updated_at?: string
+          vehicle_info?: string | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          is_online?: boolean
+          last_lat?: number | null
+          last_lng?: number | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          specialization?: string | null
+          total_earnings?: number
+          updated_at?: string
+          vehicle_info?: string | null
+        }
+        Relationships: []
+      }
+      ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          ratee_id: string
+          rater_id: string
+          sos_id: string
+          stars: number
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ratee_id: string
+          rater_id: string
+          sos_id: string
+          stars: number
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ratee_id?: string
+          rater_id?: string
+          sos_id?: string
+          stars?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_sos_id_fkey"
+            columns: ["sos_id"]
+            isOneToOne: false
+            referencedRelation: "sos_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sos_requests: {
+        Row: {
+          created_at: string
+          driver_id: string
+          id: string
+          issue_type: string
+          lat: number
+          lng: number
+          mechanic_id: string | null
+          notes: string | null
+          status: Database["public"]["Enums"]["sos_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          driver_id: string
+          id?: string
+          issue_type: string
+          lat: number
+          lng: number
+          mechanic_id?: string | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["sos_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          driver_id?: string
+          id?: string
+          issue_type?: string
+          lat?: number
+          lng?: number
+          mechanic_id?: string | null
+          notes?: string | null
+          status?: Database["public"]["Enums"]["sos_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +176,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      sos_status:
+        | "pending"
+        | "accepted"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+      user_role: "driver" | "mechanic"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +309,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      sos_status: [
+        "pending",
+        "accepted",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
+      user_role: ["driver", "mechanic"],
+    },
   },
 } as const
