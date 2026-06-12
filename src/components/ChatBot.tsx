@@ -4,13 +4,25 @@ import { useState } from "react";
 import { Bot, Send, X, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { ISSUES } from "./IssueChips";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ChatBot({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      fetch: async (url, init) => {
+        const { data } = await supabase.auth.getSession();
+        const headers = new Headers(init?.headers);
+        if (data.session?.access_token) {
+          headers.set("Authorization", `Bearer ${data.session.access_token}`);
+        }
+        return fetch(url, { ...init, headers });
+      },
+    }),
   });
   const busy = status === "submitted" || status === "streaming";
+
 
   if (!open) return null;
 

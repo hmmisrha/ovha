@@ -170,7 +170,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          full_name: string | null
+          id: string | null
+          is_online: boolean | null
+          last_lat: number | null
+          last_lng: number | null
+          role: Database["public"]["Enums"]["user_role"] | null
+          specialization: string | null
+        }
+        Insert: {
+          full_name?: string | null
+          id?: string | null
+          is_online?: boolean | null
+          last_lat?: never
+          last_lng?: never
+          role?: Database["public"]["Enums"]["user_role"] | null
+          specialization?: string | null
+        }
+        Update: {
+          full_name?: string | null
+          id?: string | null
+          is_online?: boolean | null
+          last_lat?: never
+          last_lng?: never
+          role?: Database["public"]["Enums"]["user_role"] | null
+          specialization?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

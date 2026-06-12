@@ -28,7 +28,7 @@ function MapPage() {
       if (profile!.role === "driver") {
         // Nearby online mechanics
         const { data } = await supabase
-          .from("profiles")
+          .from("profiles_public")
           .select("id,full_name,specialization,last_lat,last_lng,is_online")
           .eq("role", "mechanic")
           .eq("is_online", true);
