@@ -63,6 +63,15 @@ export function JobsPage() {
     toast.success("Job accepted!");
   }
 
+  async function advance(id: string, next: "in_progress" | "completed") {
+    const { error } = await supabase
+      .from("sos_requests")
+      .update({ status: next })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(next === "in_progress" ? "Marked in progress" : "Job completed!");
+  }
+
   async function reject(id: string) {
     setRequests((r) => r.filter((x) => x.id !== id));
   }
