@@ -5,6 +5,7 @@ import { haversineKm, etaMinutes, getGeolocation } from "@/lib/geo";
 import { Power, MapPin, Clock, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
+import { StatusTimeline, type SosStatus } from "@/components/StatusTimeline";
 
 interface Sos {
   id: string;
