@@ -28,7 +28,8 @@ function DriverHome() {
   const [issue, setIssue] = useState<Issue>();
   const [chatOpen, setChatOpen] = useState(false);
   const [sending, setSending] = useState(false);
-  const [activeSos, setActiveSos] = useState<{ id: string; status: string; mechanic_id: string | null } | null>(null);
+  const [activeSos, setActiveSos] = useState<{ id: string; status: SosStatus; mechanic_id: string | null } | null>(null);
+  const [showRating, setShowRating] = useState<{ sosId: string; mechanicId: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -41,14 +42,26 @@ function DriverHome() {
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle()
-      .then(({ data }) => { if (mounted && data) setActiveSos(data); });
+      .then(({ data }) => { if (mounted && data) setActiveSos(data as any); });
     const ch = supabase
       .channel(`sos-driver-${user.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "sos_requests", filter: `driver_id=eq.${user.id}` },
-        (p) => setActiveSos(p.new as any))
+        (p) => {
+          const row = p.new as any;
+          if (row.status === "completed" && row.mechanic_id) {
+            setShowRating({ sosId: row.id, mechanicId: row.mechanic_id });
+            setActiveSos(null);
+            toast.success("Job completed! Please rate your mechanic.");
+          } else if (row.status === "cancelled") {
+            setActiveSos(null);
+          } else {
+            setActiveSos(row);
+          }
+        })
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(ch); };
   }, [user]);
+
 
   async function triggerSOS() {
     if (!user) return;
