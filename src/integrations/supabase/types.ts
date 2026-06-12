@@ -175,6 +175,8 @@ export type Database = {
           full_name: string | null
           id: string | null
           is_online: boolean | null
+          last_lat: number | null
+          last_lng: number | null
           role: Database["public"]["Enums"]["user_role"] | null
           specialization: string | null
         }
@@ -182,6 +184,8 @@ export type Database = {
           full_name?: string | null
           id?: string | null
           is_online?: boolean | null
+          last_lat?: never
+          last_lng?: never
           role?: Database["public"]["Enums"]["user_role"] | null
           specialization?: string | null
         }
@@ -189,6 +193,8 @@ export type Database = {
           full_name?: string | null
           id?: string | null
           is_online?: boolean | null
+          last_lat?: never
+          last_lng?: never
           role?: Database["public"]["Enums"]["user_role"] | null
           specialization?: string | null
         }
