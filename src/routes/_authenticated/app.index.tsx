@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { JobsPage } from "@/components/JobsView";
+import { StatusTimeline, type SosStatus } from "@/components/StatusTimeline";
+import { RatingDialog } from "@/components/RatingDialog";
+
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({ meta: [{ title: "OVHA — Dashboard" }] }),
