@@ -32,7 +32,7 @@ function ChatPage() {
         setSosId(data.id);
         const otherId = profile.role === "driver" ? data.mechanic_id : data.driver_id;
         if (otherId) {
-          const { data: p } = await supabase.from("profiles").select("full_name").eq("id", otherId).maybeSingle();
+          const { data: p } = await supabase.from("profiles_public").select("full_name").eq("id", otherId).maybeSingle();
           setPartnerName(p?.full_name || (profile.role === "driver" ? "Mechanic" : "Driver"));
         }
       });
