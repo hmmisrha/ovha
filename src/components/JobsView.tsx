@@ -34,6 +34,7 @@ export function JobsPage() {
         .from("sos_requests")
         .select("*")
         .or(`status.eq.pending,mechanic_id.eq.${user.id}`)
+        .not("status", "in", "(completed,cancelled)")
         .order("created_at", { ascending: false });
       if (data) setRequests(data as Sos[]);
     };
