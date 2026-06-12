@@ -11,6 +11,9 @@ import { toast } from "sonner";
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { JobsPage } from "@/components/JobsView";
+import { StatusTimeline, type SosStatus } from "@/components/StatusTimeline";
+import { RatingDialog } from "@/components/RatingDialog";
+
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({ meta: [{ title: "OVHA — Dashboard" }] }),
@@ -28,7 +31,8 @@ function DriverHome() {
   const [issue, setIssue] = useState<Issue>();
   const [chatOpen, setChatOpen] = useState(false);
   const [sending, setSending] = useState(false);
-  const [activeSos, setActiveSos] = useState<{ id: string; status: string; mechanic_id: string | null } | null>(null);
+  const [activeSos, setActiveSos] = useState<{ id: string; status: SosStatus; mechanic_id: string | null } | null>(null);
+  const [showRating, setShowRating] = useState<{ sosId: string; mechanicId: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -41,14 +45,26 @@ function DriverHome() {
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle()
-      .then(({ data }) => { if (mounted && data) setActiveSos(data); });
+      .then(({ data }) => { if (mounted && data) setActiveSos(data as any); });
     const ch = supabase
       .channel(`sos-driver-${user.id}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "sos_requests", filter: `driver_id=eq.${user.id}` },
-        (p) => setActiveSos(p.new as any))
+        (p) => {
+          const row = p.new as any;
+          if (row.status === "completed" && row.mechanic_id) {
+            setShowRating({ sosId: row.id, mechanicId: row.mechanic_id });
+            setActiveSos(null);
+            toast.success("Job completed! Please rate your mechanic.");
+          } else if (row.status === "cancelled") {
+            setActiveSos(null);
+          } else {
+            setActiveSos(row);
+          }
+        })
       .subscribe();
     return () => { mounted = false; supabase.removeChannel(ch); };
   }, [user]);
+
 
   async function triggerSOS() {
     if (!user) return;
@@ -88,18 +104,28 @@ function DriverHome() {
       </header>
 
       {activeSos ? (
-        <div className="mx-5 mt-4 card-soft p-5 text-center space-y-3 border-primary glow-blue">
-          <Loader2 className="h-7 w-7 mx-auto animate-spin text-primary" />
-          <div>
-            <div className="font-bold">SOS active</div>
-            <div className="text-xs text-muted-foreground">Status: {activeSos.status}{activeSos.mechanic_id ? " · mechanic assigned" : " · waiting for mechanic"}</div>
+        <div className="mx-5 mt-4 card-soft p-5 space-y-4 border-primary">
+          <div className="text-center space-y-1">
+            <div className="font-bold flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              SOS active
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {activeSos.status === "pending" && "Broadcasting to nearby mechanics…"}
+              {activeSos.status === "accepted" && "Mechanic assigned · on the way"}
+              {activeSos.status === "in_progress" && "Mechanic is working on your vehicle"}
+            </div>
           </div>
+          <StatusTimeline status={activeSos.status} />
           {activeSos.mechanic_id && (
-            <Link to="/app/chat" className="block btn-pill bg-primary text-primary-foreground py-2.5 text-sm font-semibold">Open chat</Link>
+            <Link to="/app/chat" className="block text-center btn-pill bg-primary text-primary-foreground py-2.5 text-sm font-semibold">Open chat</Link>
           )}
-          <button onClick={cancelSOS} className="text-xs text-muted-foreground underline">Cancel SOS</button>
+          {activeSos.status === "pending" && (
+            <button onClick={cancelSOS} className="block w-full text-xs text-muted-foreground underline">Cancel SOS</button>
+          )}
         </div>
       ) : (
+
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 gap-8">
           <SOSButton onTrigger={triggerSOS} loading={sending} />
           <p className="text-center text-sm text-muted-foreground -mt-2">Tap to alert nearby mechanics</p>
@@ -133,6 +159,14 @@ function DriverHome() {
       </div>
 
       <ChatBot open={chatOpen} onClose={() => setChatOpen(false)} />
+      {showRating && user && (
+        <RatingDialog
+          sosId={showRating.sosId}
+          rateeId={showRating.mechanicId}
+          raterId={user.id}
+          onClose={() => setShowRating(null)}
+        />
+      )}
     </div>
   );
 }

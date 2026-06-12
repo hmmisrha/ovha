@@ -5,6 +5,7 @@ import { haversineKm, etaMinutes, getGeolocation } from "@/lib/geo";
 import { Power, MapPin, Clock, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
+import { StatusTimeline, type SosStatus } from "@/components/StatusTimeline";
 
 interface Sos {
   id: string;
@@ -34,6 +35,7 @@ export function JobsPage() {
         .from("sos_requests")
         .select("*")
         .or(`status.eq.pending,mechanic_id.eq.${user.id}`)
+        .not("status", "in", "(completed,cancelled)")
         .order("created_at", { ascending: false });
       if (data) setRequests(data as Sos[]);
     };
@@ -61,6 +63,15 @@ export function JobsPage() {
       .eq("status", "pending");
     if (error) return toast.error(error.message);
     toast.success("Job accepted!");
+  }
+
+  async function advance(id: string, next: "in_progress" | "completed") {
+    const { error } = await supabase
+      .from("sos_requests")
+      .update({ status: next })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(next === "in_progress" ? "Marked in progress" : "Job completed!");
   }
 
   async function reject(id: string) {
@@ -120,10 +131,29 @@ export function JobsPage() {
                   {r.status}
                 </span>
               </div>
+              {mine && <StatusTimeline status={r.status as SosStatus} />}
               {mine ? (
-                <Link to="/app/chat" className="block text-center btn-pill bg-primary text-primary-foreground py-2 text-sm font-semibold">
-                  Open chat
-                </Link>
+                <div className="space-y-2">
+                  <Link to="/app/chat" className="block text-center btn-pill bg-card border border-primary text-primary py-2 text-sm font-semibold">
+                    Open chat
+                  </Link>
+                  {r.status === "accepted" && (
+                    <button
+                      onClick={() => advance(r.id, "in_progress")}
+                      className="w-full btn-pill bg-primary text-primary-foreground py-2 text-sm font-bold"
+                    >
+                      Mark arrived · Start work
+                    </button>
+                  )}
+                  {r.status === "in_progress" && (
+                    <button
+                      onClick={() => advance(r.id, "completed")}
+                      className="w-full btn-pill bg-success text-success-foreground py-2 text-sm font-bold"
+                    >
+                      <Check className="h-4 w-4 inline mr-1" /> Mark Completed
+                    </button>
+                  )}
+                </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
                   <button
