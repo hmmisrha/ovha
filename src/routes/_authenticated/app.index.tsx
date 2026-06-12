@@ -159,6 +159,14 @@ function DriverHome() {
       </div>
 
       <ChatBot open={chatOpen} onClose={() => setChatOpen(false)} />
+      {showRating && user && (
+        <RatingDialog
+          sosId={showRating.sosId}
+          rateeId={showRating.mechanicId}
+          raterId={user.id}
+          onClose={() => setShowRating(null)}
+        />
+      )}
     </div>
   );
 }
