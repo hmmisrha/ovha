@@ -104,18 +104,28 @@ function DriverHome() {
       </header>
 
       {activeSos ? (
-        <div className="mx-5 mt-4 card-soft p-5 text-center space-y-3 border-primary glow-blue">
-          <Loader2 className="h-7 w-7 mx-auto animate-spin text-primary" />
-          <div>
-            <div className="font-bold">SOS active</div>
-            <div className="text-xs text-muted-foreground">Status: {activeSos.status}{activeSos.mechanic_id ? " · mechanic assigned" : " · waiting for mechanic"}</div>
+        <div className="mx-5 mt-4 card-soft p-5 space-y-4 border-primary">
+          <div className="text-center space-y-1">
+            <div className="font-bold flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              SOS active
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {activeSos.status === "pending" && "Broadcasting to nearby mechanics…"}
+              {activeSos.status === "accepted" && "Mechanic assigned · on the way"}
+              {activeSos.status === "in_progress" && "Mechanic is working on your vehicle"}
+            </div>
           </div>
+          <StatusTimeline status={activeSos.status} />
           {activeSos.mechanic_id && (
-            <Link to="/app/chat" className="block btn-pill bg-primary text-primary-foreground py-2.5 text-sm font-semibold">Open chat</Link>
+            <Link to="/app/chat" className="block text-center btn-pill bg-primary text-primary-foreground py-2.5 text-sm font-semibold">Open chat</Link>
           )}
-          <button onClick={cancelSOS} className="text-xs text-muted-foreground underline">Cancel SOS</button>
+          {activeSos.status === "pending" && (
+            <button onClick={cancelSOS} className="block w-full text-xs text-muted-foreground underline">Cancel SOS</button>
+          )}
         </div>
       ) : (
+
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 gap-8">
           <SOSButton onTrigger={triggerSOS} loading={sending} />
           <p className="text-center text-sm text-muted-foreground -mt-2">Tap to alert nearby mechanics</p>
